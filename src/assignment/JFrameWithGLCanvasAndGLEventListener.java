@@ -5,12 +5,17 @@ import com.sun.opengl.util.*;
 import com.sun.opengl.util.gl2.GLUT;
 
 import java.awt.*;
-import java.lang.Math;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
 import javax.media.opengl.fixedfunc.*;
 import javax.swing.*;
 import javax.media.opengl.glu.GLU;
+import java.awt.event.*;
+import java.util.*;
+import java.util.function.Consumer;
+
+import static javax.swing.UIManager.*;
+
 
 /**
  * Created by martin on 07/02/2015.
@@ -20,7 +25,8 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     implements GLEventListener, Runnable{
 
     //title
-    protected String title;
+    protected final String title;
+    protected final JMenuBar menuBar;
 
     //height and width of JFrame
     protected int height, width;
@@ -28,23 +34,25 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     //interface to OpenGL 2.0
     protected GL2 gl2;
 
-    //for the GL Utility
-    protected GLU glu;
-
-    protected GLUT glut;
+    //the GL Utility
+    protected final GLU glu;
+    protected final GLUT glut;
 
     //drawable in a frame
-    protected GLCanvas canvas;
+    protected final GLCanvas canvas;
 
     //OpenGL capabilities
-    protected GLCapabilities capabilities;
+    protected final GLCapabilities capabilities;
 
     //drive display() in loop
-    protected boolean startAnimator ;
-    protected Animator animator;
+    protected final boolean startAnimator ;
+    protected final Animator animator;
 
     //last frame time stamp in nanoseconds
     protected long lastFrameTime;
+
+    //key listener
+    protected final MultiKeyListener listener;
 
     /**
      * Creates Frame with OpenGL 2.0 capabilities and settings
@@ -53,7 +61,10 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
      * @param title         a title of the window
      * @param startAnimator if you want animator thread 60fps be running set this to true
      */
-    public JFrameWithGLCanvasAndGLEventListener(int width, int height, String title, boolean startAnimator) {
+    public JFrameWithGLCanvasAndGLEventListener(final int width,
+                                                final int height,
+                                                final String title,
+                                                final boolean startAnimator) {
 
 
         if(height <= 0 || width <= 0) throw new RuntimeException("bad frame size!");
@@ -75,6 +86,22 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
         canvas = new GLCanvas(capabilities);
         canvas.addGLEventListener(this);
 
+        //GL Utilities
+        glu = new GLU();
+        glut = new GLUT();
+
+        //animator
+        animator = new FPSAnimator(canvas, 60);
+
+        //key listener
+        listener = new MultiKeyListener();
+        canvas.addKeyListener(listener);
+
+        //menu
+        menuBar = new JMenuBar();
+        menuBar.add(themesMenu());
+        setJMenuBar(menuBar);
+
         //initialize JFrame
         setTitle(title);
         setSize(width + 16, height + 38);
@@ -82,6 +109,12 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().add(canvas, BorderLayout.CENTER);
         canvas.requestFocus();
+
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            SwingUtilities.updateComponentTreeUI(JFrameWithGLCanvasAndGLEventListener.this);
+        } catch (Exception e) { e.printStackTrace(); }
+
         setVisible(true);
     }
 
@@ -107,15 +140,14 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     @Override
     public void init(GLAutoDrawable glAutoDrawable) {
 
+        //OpenGL 2.0 interface
+        gl2 = canvas.getGL().getGL2();
+
         // start animator thread (if requested) which calls display() 60 times per seconds
         if(startAnimator) {
-            animator = new FPSAnimator(canvas, 60);
             animator.start();
             setLastFrameTime();
         }
-
-        //OpenGL 2.0 interface
-        gl2 = canvas.getGL().getGL2();
     }
 
     // Called for handling reshaped drawing area
@@ -139,10 +171,9 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     // Called for OpenGL rendering every reshape
     @Override
     public void display(GLAutoDrawable glAutoDrawable) {
-
-        calculateFPS();
         //clear buffer
         gl2.glClear(GL2.GL_COLOR_BUFFER_BIT);
+        calculateFPS();
     }
 
     /**
@@ -152,7 +183,6 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
      * @return float
      */
     protected float random(float range) {
-
         return (float) Math.round((range) * Math.random());
     }
 
@@ -163,12 +193,44 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
      * @return integer
      */
     protected int random(int range) {
-
         return (int) Math.round((range) * Math.random());
     }
 
     @Override
     public void dispose(GLAutoDrawable glAutoDrawable) {
 
+    }
+
+    private JMenu themesMenu() {
+        JMenu menuLookAndFeel = new JMenu("Themes");
+        Arrays.asList(getInstalledLookAndFeels())
+                .forEach(i -> menuLookAndFeel.add(new LookAndFeelMenuItem(i)));
+        return menuLookAndFeel;
+    }
+
+    private class LookAndFeelMenuItem extends JMenuItem implements ActionListener{
+
+        private final LookAndFeelInfo lookAndFeelInfo;
+
+        private LookAndFeelMenuItem(final LookAndFeelInfo lookAndFeelInfo) {
+            super(lookAndFeelInfo.getName());
+            this.lookAndFeelInfo = lookAndFeelInfo;
+            addActionListener(this);
+            //System.out.println("theme: " + lookAndFeelInfo.getClassName());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            System.out.println("current theme: " + event.getActionCommand());
+            try {
+                LookAndFeelMenuItem menuItem = ((LookAndFeelMenuItem) event.getSource());
+                String className = menuItem.lookAndFeelInfo.getClassName();
+                UIManager.setLookAndFeel(className);
+                SwingUtilities.updateComponentTreeUI(JFrameWithGLCanvasAndGLEventListener.this);
+                //pack();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ import java.util.*;
 
 public class MultiKeyListener extends KeyAdapter {
 
-    protected List<Integer> pressed;
+    protected final List<Integer> pressed;
     protected volatile Integer lastPressed;
     private volatile Integer lastReleased;
 
