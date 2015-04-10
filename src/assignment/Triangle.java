@@ -7,16 +7,14 @@ import com.sun.opengl.util.texture.Texture;
  */
 public class Triangle {
 
-    public final float[] A, B, C;
-    public final float[] normal;
+    public final float[] A, B, C, normal;
     public final Texture texture;
 
     public Triangle(final Texture tex, final float[]...vertices) {
-        if(vertices.length != 3) throw new RuntimeException("triangle has 3 vertices");
         A = vertices[0];
         B = vertices[1];
         C = vertices[2];
-        normal = normalVFromTriangle(A, B, C);
+        normal = calculateNormalFromTriangle(A, B, C);
         texture = tex;
     }
 
@@ -27,10 +25,7 @@ public class Triangle {
      * @param v3 vertex 3
      * @return vector perpendicular to given triangle
      */
-    protected static float[] normalVFromTriangle(final float[] v1, final float[] v2, final float[] v3) {
-        if(v1.length != 3 || v2.length != 3 || v3.length != 3)
-            throw new IllegalArgumentException("use float[3] for arguments!");
-
+    protected static float[] calculateNormalFromTriangle(final float[] v1, final float[] v2, final float[] v3) {
         float[] normal = new float[3];
         float[] vector1 = new float[3];
         float[] vector2 = new float[3];

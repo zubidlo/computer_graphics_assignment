@@ -12,8 +12,9 @@ import javax.swing.*;
 import javax.media.opengl.glu.GLU;
 import java.awt.event.*;
 import java.util.*;
-import java.util.function.Consumer;
 
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
+import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 import static javax.swing.UIManager.*;
 
 
@@ -49,7 +50,7 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     protected final Animator animator;
 
     //last frame time stamp in nanoseconds
-    protected long lastFrameTime;
+    protected volatile long lastFrameTime;
 
     //key listener
     protected final MultiKeyListener listener;
@@ -153,19 +154,15 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
     // Called for handling reshaped drawing area
     @Override
     public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
-
-        //define the drawing area coordinates
-        gl2.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-        gl2.glLoadIdentity();
-
-        //if window were re-sized set new width and height
-        gl2.glOrtho(0, width, 0, height, -1.0, 1.0);
+        if (height == 0) height = 1;
+        float aspect = (float) width / height;
         gl2.glViewport(0, 0, width, height);
-        this.width = width;
-        this.height = height;
-
-        out.println("reshape() canvas width:" + width);
-        out.println("reshape() canvas height:" + height);
+        gl2.glMatrixMode(GL_PROJECTION);
+        gl2.glLoadIdentity();
+        glu.gluPerspective(45.0, aspect, 0.1, 100.0);
+        gl2.glMatrixMode(GL_MODELVIEW);
+        gl2.glLoadIdentity(); // reset
+        //out.printf("canvas [width:%d height:%d]%n", width, height);
     }
 
     // Called for OpenGL rendering every reshape
@@ -176,30 +173,8 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
         calculateFPS();
     }
 
-    /**
-     * Returns random int from [0..range]. If range is negative,
-     * then returns random number from [range..0].
-     * @param range upper range limit
-     * @return float
-     */
-    protected float random(float range) {
-        return (float) Math.round((range) * Math.random());
-    }
-
-    /**
-     * Returns random float from [0..range]. If range is negative,
-     * then returns random number from [range..0].
-     * @param range upper range limit
-     * @return integer
-     */
-    protected int random(int range) {
-        return (int) Math.round((range) * Math.random());
-    }
-
     @Override
-    public void dispose(GLAutoDrawable glAutoDrawable) {
-
-    }
+    public void dispose(GLAutoDrawable glAutoDrawable) {}
 
     private JMenu themesMenu() {
         JMenu menuLookAndFeel = new JMenu("Themes");

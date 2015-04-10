@@ -11,7 +11,6 @@ public class Quad extends Triangle {
 
     public Quad(Texture tex, float[]... vertices) {
         super(tex, vertices[0], vertices[1], vertices[2]);
-        if(vertices.length != 4) throw new RuntimeException("quad must have 4 vertices");
         D = vertices[3];
     }
 }

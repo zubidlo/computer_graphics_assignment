@@ -147,19 +147,6 @@ public class House extends JFrameWithGLCanvasAndGLEventListener {
         createPolygons();
     }
 
-    @Override
-    public void reshape(GLAutoDrawable glAutoDrawable, int x, int y, int width, int height) {
-        if (height == 0) height = 1;
-        float aspect = (float) width / height;
-        gl2.glViewport(0, 0, width, height);
-        gl2.glMatrixMode(GL_PROJECTION);
-        gl2.glLoadIdentity();
-        glu.gluPerspective(45.0, aspect, 0.1, 100.0);
-        gl2.glMatrixMode(GL_MODELVIEW);
-        gl2.glLoadIdentity(); // reset
-        //out.printf("canvas [width:%d height:%d]%n", width, height);
-    }
-
     private void render(Triangle triangle) {
         if(texturesAreOn) {
             gl2.glEnable(GL.GL_TEXTURE_2D);
