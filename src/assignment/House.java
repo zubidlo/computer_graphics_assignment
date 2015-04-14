@@ -81,7 +81,7 @@ public class House extends JFrameWithGLCanvasAndGLEventListener {
 
     private List<Texture> loadTextures() {
         List<Texture> textures = new ArrayList<>();
-        Arrays.asList("door1.png", "roof1.png", "walls1.png", "walls2.png", "wood_tex1.png").forEach(t -> {
+        Arrays.asList("door1.png", "roof1.png", "walls1.png", "walls2.png", "wood_tex1.png", "walls1_small.png").forEach(t -> {
             try {
                 BufferedImage image = ImageIO.read(getClass().getClassLoader().getResource("assignment/images/" + t));
                 textures.add(AWTTextureIO.newTexture(image, false));
@@ -131,7 +131,7 @@ public class House extends JFrameWithGLCanvasAndGLEventListener {
         doorFaceQuad = new Quad(textures.get(0), doorRightDown, doorLeftDown, doorLeftUp, doorRightUp);
         frontFaceQuadRIGHT = new Quad(textures.get(2), frontRightDown, doorRightDown, aboveDoorRight, frontRightUp);
         frontFaceQuadLEFT = new Quad(textures.get(2), doorLeftDown, frontLeftDown, frontLeftUp, aboveDoorLeft);
-        frontFaceQuadTOP = new Quad(textures.get(2), doorRightUp, doorLeftUp, aboveDoorLeft, aboveDoorRight);
+        frontFaceQuadTOP = new Quad(textures.get(5), doorRightUp, doorLeftUp, aboveDoorLeft, aboveDoorRight);
     }
 
     @Override
