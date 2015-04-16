@@ -109,7 +109,6 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         getContentPane().add(canvas, BorderLayout.CENTER);
-        canvas.requestFocus();
 
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -117,6 +116,7 @@ public class JFrameWithGLCanvasAndGLEventListener extends JFrame
         } catch (Exception e) { e.printStackTrace(); }
 
         setVisible(true);
+        canvas.requestFocus();
     }
 
     @Override
