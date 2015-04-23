@@ -3,6 +3,9 @@ package assignment;
 import java.awt.event.*;
 import java.util.*;
 
+/**
+ * multi-key listener
+ */
 public class MultiKeyListener extends KeyAdapter {
 
     private final List<Integer> pressed;

@@ -3,6 +3,7 @@ package assignment;
 import com.sun.opengl.util.texture.Texture;
 
 /**
+ * triangle
  * Created by martin on 09/04/2015.
  */
 public class Triangle {

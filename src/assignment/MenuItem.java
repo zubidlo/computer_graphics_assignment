@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.util.function.Consumer;
 
 /**
+ * menu item
  * Created by martin on 09/04/2015.
  */
 class MenuItem extends JMenuItem implements ActionListener {

@@ -18,6 +18,7 @@ import static javax.media.opengl.GL2.*;
 import static java.awt.event.KeyEvent.*;
 
 /**
+ * house with opening doors
  * Created by martin on 09/04/2015.
  */
 public class House extends JFrameWithGLCanvasAndGLEventListener {

@@ -3,6 +3,7 @@ package assignment;
 import com.sun.opengl.util.texture.Texture;
 
 /**
+ * quad
  * Created by martin on 09/04/2015.
  */
 public class Quad extends Triangle {
